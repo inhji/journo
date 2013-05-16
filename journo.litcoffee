@@ -92,6 +92,7 @@ writing every post, and creating an RSS feed.
     Journo.build = ->
       do loadManifest
       fs.mkdirSync('site') unless fs.existsSync('site')
+      fs.mkdirSync('public') unless fs.existsSync('public')
 
       exec "rsync -vur --delete public/ site", (err, stdout, stderr) ->
         throw err if err
@@ -121,7 +122,6 @@ so you don't need to remember any of that.
         fatal "Unable to read config.json"
       shared.siteUrl = shared.config.url.replace(/\/$/, '')
 
-
 Publish via rsync
 -----------------
 
@@ -130,6 +130,7 @@ the site and **rysnc** it up to the server.
 
     Journo.publish = ->
       do Journo.build
+      fs.mkdirSync('site/images') unless fs.existsSync('site/images')
       rsync 'site/images/', path.join(shared.config.publish, 'images/'), ->
         rsync 'site/', shared.config.publish
 
@@ -456,7 +457,3 @@ the site build.
     fatal = (message) ->
       console.error message
       process.exit 1
-
-
-
-
