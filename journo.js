@@ -91,9 +91,7 @@
     if (!fs.existsSync('site/images')) {
       fs.mkdirSync('site/images');
     }
-    return rsync('site/images/', path.join(shared.config.publish, 'images/'), function() {
-      return rsync('site/', shared.config.publish);
-    });
+    return rsync('site/', shared.config.publish);
   };
 
   rsync = function(from, to, callback) {
