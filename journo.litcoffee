@@ -347,21 +347,26 @@ silly things, like* `journo toString` *but no big deal.*
 
 Let's also provide a help page that lists the available commands.
 
-    Journo.help = Journo['--help'] = ->
+    Journo.help = Journo['--help'] = Journo['-h'] = ->
       console.log """
         Usage: journo [command]
 
+        Journo: Blogging like it's 1999.
+
         If called without a command, `journo` will preview your blog.
 
-        init      start a new blog in the current folder
-        build     build a static version of the blog into 'site'
-        preview   live preview the blog via a local server
-        publish   publish the blog to your remote server
+        init            start a new blog in the current folder
+        build           build a static version of the blog into 'site'
+        preview         live preview the blog via a local server
+        publish         publish the blog to your remote server
+
+        --version, -v   show the journo version
+        --help,    -h   display this help screen
       """
 
 And we might as well do the version number, for completeness' sake.
 
-    Journo.version = Journo['--version'] = ->
+    Journo.version = Journo['--version'] = Journo['-v'] = ->
       console.log "Journo 0.0.1"
 
 
