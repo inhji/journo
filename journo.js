@@ -266,11 +266,11 @@
     return console.error("Journo doesn't know how to '" + command + "'");
   };
 
-  Journo.help = Journo['--help'] = function() {
-    return console.log("Usage: journo [command]\n\nIf called without a command, `journo` will preview your blog.\n\ninit      start a new blog in the current folder\nbuild     build a static version of the blog into 'site'\npreview   live preview the blog via a local server\npublish   publish the blog to your remote server");
+  Journo.help = Journo['--help'] = Journo['-h'] = function() {
+    return console.log("Usage: journo [command]\n\nJourno: Blogging like it's 1999.\n\nIf called without a command, `journo` will preview your blog.\n\ninit            start a new blog in the current folder\nbuild           build a static version of the blog into 'site'\npreview         live preview the blog via a local server\npublish         publish the blog to your remote server\n\n--version, -v   show the journo version\n--help,    -h   display this help screen");
   };
 
-  Journo.version = Journo['--version'] = function() {
+  Journo.version = Journo['--version'] = Journo['-v'] = function() {
     return console.log("Journo 0.0.1");
   };
 

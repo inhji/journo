@@ -92,6 +92,7 @@ path = require 'path'
 Journo.build = ->
   do loadManifest
   fs.mkdirSync('site') unless fs.existsSync('site')
+  fs.mkdirSync('public') unless fs.existsSync('public')
 
   exec "rsync -vur --delete public/ site", (err, stdout, stderr) ->
     throw err if err
@@ -121,7 +122,6 @@ loadConfig = ->
     fatal "Unable to read config.json"
   shared.siteUrl = shared.config.url.replace(/\/$/, '')
 ```
-
 Publish via rsync
 -----------------
 
@@ -130,6 +130,7 @@ the site and **rysnc** it up to the server.
 ```coffeescript
 Journo.publish = ->
   do Journo.build
+  fs.mkdirSync('site/images') unless fs.existsSync('site/images')
   rsync 'site/images/', path.join(shared.config.publish, 'images/'), ->
     rsync 'site/', shared.config.publish
 ```
@@ -206,13 +207,15 @@ We syntax-highlight blocks of code with the nifty **highlight** package that
 includes heuristics for auto-language detection, so you don't have to specify
 what you're coding in.
 ```coffeescript
-{Highlight} = require 'highlight'
+highlight = require 'highlight.js'
 
 marked.setOptions
   highlight: (code, lang) ->
-    Highlight code
+    if highlight.LANGUAGES[lang]?
+      highlight.highlight(lang, code, true).value
+    else
+      highlight.highlightAuto(code).value
 ```
-
 Publish a Feed
 --------------
 
@@ -255,7 +258,7 @@ Journo.init = ->
   here = fs.realpathSync '.'
   if fs.existsSync 'posts'
     fatal "A blog already exists in #{here}"
-  bootstrap = path.join(__dirname, 'bootstrap')
+  bootstrap = path.join(__dirname, 'bootstrap/*')
   exec "rsync -vur --delete #{bootstrap} .", (err, stdout, stderr) ->
     throw err if err
     console.log "Initialized new blog in #{here}"
@@ -344,21 +347,26 @@ Journo.run = ->
 ```
 Let's also provide a help page that lists the available commands.
 ```coffeescript
-Journo.help = Journo['--help'] = ->
+Journo.help = Journo['--help'] = Journo['-h'] = ->
   console.log """
     Usage: journo [command]
 
+    Journo: Blogging like it's 1999.
+
     If called without a command, `journo` will preview your blog.
 
-    init      start a new blog in the current folder
-    build     build a static version of the blog into 'site'
-    preview   live preview the blog via a local server
-    publish   publish the blog to your remote server
+    init            start a new blog in the current folder
+    build           build a static version of the blog into 'site'
+    preview         live preview the blog via a local server
+    publish         publish the blog to your remote server
+
+    --version, -v   show the journo version
+    --help,    -h   display this help screen
   """
 ```
 And we might as well do the version number, for completeness' sake.
 ```coffeescript
-Journo.version = Journo['--version'] = ->
+Journo.version = Journo['--version'] = Journo['-v'] = ->
   console.log "Journo 0.0.1"
 ```
 
@@ -450,11 +458,7 @@ catchErrors = (func) ->
 ```
 Finally, for errors that you want the app to die on -- things that should break
 the site build.
-```coffeescript
-fatal = (message) ->
-  console.error message
-  process.exit 1
-```
 
-
-
+    fatal = (message) ->
+      console.error message
+      process.exit 1
